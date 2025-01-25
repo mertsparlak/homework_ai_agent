@@ -2,7 +2,7 @@ import os
 import google.generativeai as genai
 import re
 import pandas as pd
-import fitz  
+import fitz 
 from api_key import your_api
 
 # API Anahtarını ve modeli tanımlayın
@@ -18,13 +18,13 @@ assignment_desc = input("Lütfen ödevde öğrencilerden ne istediğinizi kısac
 # Klasördeki PDF dosyalarını listele
 pdf_files = [f for f in os.listdir(folder_path) if f.endswith(".pdf")]
 
-# Sonuçları saklamak için bir liste oluştur
+# Sonuçları saklamak için
 results = []
 
 # Öğrencilerin isim, soyad, ID'lerini ve yanıtları çıkaran regexler
 name_pattern = re.compile(r"([A-Za-z]+)\s+([A-Za-z]+)\s*ID:? (\d+)")
 
-# PDF dosyalarını işle
+
 for pdf_file in pdf_files:
     file_path = os.path.join(folder_path, pdf_file)
     print(f"Dosya işleniyor: {file_path}")
@@ -37,7 +37,7 @@ for pdf_file in pdf_files:
         doc.close()
     except Exception as e:
         print(f"PDF okuma hatası: {e}")
-        results.append({ # Hata durumunda sonuçları kaydet
+        results.append({ 
             "Öğrenci Adı": "Bilinmiyor",
             "Öğrenci Soyadı": "Bilinmiyor",
             "Öğrenci ID": "Bilinmiyor",
