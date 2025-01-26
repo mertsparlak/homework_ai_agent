@@ -109,27 +109,33 @@ def browse_save_path():
 window = tk.Tk()
 window.title("Ödev Analiz Aracı")
 
-# Etiketler ve giriş alanları
-tk.Label(window, text="PDF Klasör Yolu:").grid(row=0, column=0, sticky="w")
+# Pencere boyutunu ayarla (genişlik x yükseklik)
+window.geometry("500x200")  
+
+# Etiketler ve giriş alanları (padx ve pady ile boşluk)
+tk.Label(window, text="PDF Klasör Yolu:").grid(row=0, column=0, sticky="w", padx=10, pady=10)
 folder_path_entry = tk.Entry(window, width=50)
-folder_path_entry.grid(row=0, column=1, sticky="ew")
-tk.Button(window, text="Gözat", command=browse_folder).grid(row=0, column=2)
+folder_path_entry.grid(row=0, column=1, sticky="ew", padx=5, pady=7)
+tk.Button(window, text="Gözat", command=browse_folder).grid(row=0, column=2, padx=10, pady=5)
 
-tk.Label(window, text="Ders Adı:").grid(row=1, column=0, sticky="w")
+tk.Label(window, text="Ders Adı:").grid(row=1, column=0, sticky="w", padx=10, pady=5)
 course_name_entry = tk.Entry(window, width=50)
-course_name_entry.grid(row=1, column=1, sticky="ew")
+course_name_entry.grid(row=1, column=1, sticky="ew", padx=5, pady=7)
 
-tk.Label(window, text="Ödev Açıklaması:").grid(row=2, column=0, sticky="w")
+tk.Label(window, text="Ödev Açıklaması:").grid(row=2, column=0, sticky="w", padx=10, pady=5)
 assignment_desc_entry = tk.Entry(window, width=50)
-assignment_desc_entry.grid(row=2, column=1, sticky="ew")
+assignment_desc_entry.grid(row=2, column=1, sticky="ew", padx=5, pady=7)
 
-tk.Label(window, text="Kaydetme Konumu").grid(row=3, column=0, sticky="w")
+tk.Label(window, text="Kaydetme Konumu:").grid(row=3, column=0, sticky="w", padx=10, pady=5)
 save_path_entry = tk.Entry(window, width=50)
-save_path_entry.grid(row=3, column=1, sticky="ew")
-tk.Button(window, text="Gözat", command=browse_save_path).grid(row=3, column=2)
+save_path_entry.grid(row=3, column=1, sticky="ew", padx=5, pady=7)
+tk.Button(window, text="Gözat", command=browse_save_path).grid(row=3, column=2, padx=10, pady=5)
 
-# Analiz butonu
+# Analiz butonu 
 analyze_button = tk.Button(window, text="Ödevleri Analiz Et", command=analyze_assignments)
-analyze_button.grid(row=4, column=0, columnspan=3, pady=10)
+analyze_button.grid(row=4, column=0, columnspan=3, pady=(15,20)) 
+
+# Kolonların genişlemesi
+window.columnconfigure(1, weight=1) # İkinci kolon
 
 window.mainloop()
