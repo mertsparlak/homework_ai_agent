@@ -3,6 +3,8 @@ import google.generativeai as genai
 import re
 import pandas as pd
 import fitz
+import tkinter as tk
+from tkinter import filedialog, messagebox
 
 # API anahtarını ve modeli tanımla
 from api_key import your_api
@@ -91,3 +93,77 @@ df = pd.DataFrame(results)
 output_file = os.path.join(folder_path, f"{course_name}_odev_analizi.xlsx")
 df.to_excel(output_file, index=False)
 print(f"\nSonuçlar {output_file} adresine kaydedildi.")
+
+
+# Arayüz oluşturmaya başlıyoruz uygulumamız için
+def analyze_assignments():
+    folder_path = folder_path_entry.get()
+    course_name = course_name_entry.get()
+    assignment_desc = assignment_desc_entry.get()
+    save_path = save_path_entry.get()
+
+    if not all([folder_path, course_name, assignment_desc, save_path]):
+        messagebox.showerror("Hata", "Lütfen tüm alanları doldurun.")
+        return
+
+    pdf_files = [f for f in os.listdir(folder_path) if f.endswith(".pdf")]
+    results = []
+    info_pattern = re.compile(r"İSİM:\s*([A-Za-zÇŞĞÜÖİçşğüöı]+)\s*SOYAD:\s*([A-Za-zÇŞĞÜÖİçşğüöı]+)\s*İD:\s*(\d+)", re.IGNORECASE)
+
+    for pdf_file in pdf_files:
+
+        results.append({
+            "Öğrenci Adı": first_name,
+            "Öğrenci Soyadı": last_name,
+            "Öğrenci ID": student_id,
+            "Puan": score,
+            "Açıklama": explanation
+        })
+
+    try:
+        df = pd.DataFrame(results)
+        output_file = os.path.join(save_path, f"{course_name}_odev_analizi.xlsx")
+        df.to_excel(output_file, index=False)
+        messagebox.showinfo("Başarılı", f"Sonuçlar {output_file} adresine kaydedildi.")
+    except Exception as e:
+        messagebox.showerror("Kaydetme Hatası", str(e))
+
+def browse_folder():
+    filename = filedialog.askdirectory()
+    folder_path_entry.delete(0, tk.END)
+    folder_path_entry.insert(0, filename)
+
+def browse_save_path():
+    filename = filedialog.askdirectory()
+    save_path_entry.delete(0, tk.END)
+    save_path_entry.insert(0, filename)
+
+
+# Arayüz 
+window = tk.Tk()
+window.title("Ödev Analiz Aracı")
+
+# Etiketler ve giriş alanları
+tk.Label(window, text="PDF Klasör Yolu:").grid(row=0, column=0, sticky="w")
+folder_path_entry = tk.Entry(window, width=50)
+folder_path_entry.grid(row=0, column=1, sticky="ew")
+tk.Button(window, text="Gözat", command=browse_folder).grid(row=0, column=2)
+
+tk.Label(window, text="Ders Adı:").grid(row=1, column=0, sticky="w")
+course_name_entry = tk.Entry(window, width=50)
+course_name_entry.grid(row=1, column=1, sticky="ew")
+
+tk.Label(window, text="Ödev Açıklaması:").grid(row=2, column=0, sticky="w")
+assignment_desc_entry = tk.Entry(window, width=50)
+assignment_desc_entry.grid(row=2, column=1, sticky="ew")
+
+tk.Label(window, text="Kaydetme Konumu").grid(row=3, column=0, sticky="w")
+save_path_entry = tk.Entry(window, width=50)
+save_path_entry.grid(row=3, column=1, sticky="ew")
+tk.Button(window, text="Gözat", command=browse_save_path).grid(row=3, column=2)
+
+# Analiz butonu
+analyze_button = tk.Button(window, text="Ödevleri Analiz Et", command=analyze_assignments)
+analyze_button.grid(row=4, column=0, columnspan=3, pady=10)
+
+window.mainloop()
