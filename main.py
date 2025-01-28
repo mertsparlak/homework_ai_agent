@@ -6,6 +6,7 @@ import fitz
 import tkinter as tk
 from tkinter import filedialog, messagebox
 from api_key import your_api
+asgsagasg
 
 # api anahtarı ve modeli tanımlama
 api_key = your_api
