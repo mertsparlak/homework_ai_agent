@@ -2,17 +2,17 @@ import os
 import google.generativeai as genai
 import re
 import pandas as pd
-import fitz
+import fitz # PyMuPDF kütüphanesi, PDF dosyalarını okumak için kullanılır
 import tkinter as tk
 from tkinter import filedialog, messagebox
-from api_key import your_api
-asgsagasg
+from api_key import your_api # API anahtarının dışarıdan alınması
 
 # api anahtarı ve modeli tanımlama
 api_key = your_api
 genai.configure(api_key=api_key)
 model = genai.GenerativeModel("gemini-1.5-flash")
 
+#Analiz işlemleri
 def analyze_assignments():
     folder_path = folder_path_entry.get()
     course_name = course_name_entry.get()
@@ -22,9 +22,12 @@ def analyze_assignments():
     if not all([folder_path, course_name, assignment_desc, save_path]):
         messagebox.showerror("Hata", "Lütfen tüm alanları doldurun.")
         return
-
+    
+    #Klasörden pdf dosyalarını almak
     pdf_files = [f for f in os.listdir(folder_path) if f.endswith(".pdf")]
     results = []
+
+    # Öğrenci bilgilerini PDF'den çıkarmak için regex deseni
     info_pattern = re.compile(r"İSİM:\s*([A-Za-zÇŞĞÜÖİçşğüöı]+)\s*SOYAD:\s*([A-Za-zÇŞĞÜÖİçşğüöı]+)\s*İD:\s*(\d+)", re.IGNORECASE)
 
     for pdf_file in pdf_files:
@@ -53,12 +56,14 @@ def analyze_assignments():
             else:
                 print(f"!!! Öğrenci bilgileri PDF'de BULUNAMADI: {pdf_file}")
 
-            prompt = f"Ödevde istenen: {assignment_desc}. Bu ödev istenilene ne kadar uygun ve doğrudur? Puan ver (100 üzerinden ve yazarken Puan: diye belirt) ve en fazla iki cümlelik kısa ve öz bir açıklama yap (Açıklama: diye belirt). PDF içeriği aşağıdadır:\n\n{pdf_text}"
+            # Gemini API'ye gönderilecek prompt
+            prompt = f"Ödevde istenen: {assignment_desc}. Bu ödev istenilene ne kadar uygun ve doğrudur, detaylıca incele ve buna göre puan ver (100 üzerinden ve yazarken Puan: diye belirt) ve en fazla iki cümlelik kısa ve öz bir açıklama yap (Açıklama: diye belirt). PDF içeriği aşağıdadır:\n\n{pdf_text}"
             try:
                 response = model.generate_content(prompt)
                 response_text = response.text
                 print(f"Gemini yanıtı: {response_text}")
 
+                # Puan ve açıklamayı regex ile ayıklamak
                 score_match = re.search(r"(Puan:|Score:)\s*(\d+)", response_text, re.IGNORECASE)
                 explanation_match = re.search(r"(Açıklama:|Explanation:|Özet:|Summary:)\s*(.+)", response_text, re.IGNORECASE | re.DOTALL)
 
@@ -88,6 +93,7 @@ def analyze_assignments():
             "Açıklama": explanation
         })
 
+    # Sonuçları Excel dosyasına kaydetme işlemi
     try:
         df = pd.DataFrame(results)
         output_file = os.path.join(save_path, f"{course_name}_odev_analizi.xlsx")
@@ -106,14 +112,14 @@ def browse_save_path():
     save_path_entry.delete(0, tk.END)
     save_path_entry.insert(0, filename)
 
-# Arayüz oluştur
+# Arayüz oluşturmak 
 window = tk.Tk()
 window.title("Ödev Analiz Aracı")
 
 # Pencere boyutunu ayarla (genişlik x yükseklik)
 window.geometry("500x200")  
 
-# Etiketler ve giriş alanları (padx ve pady ile boşluk)
+# Etiketler ve giriş alanları (padx ve pady ile boşluk bırakıyoruz)
 tk.Label(window, text="PDF Klasör Yolu:").grid(row=0, column=0, sticky="w", padx=10, pady=10)
 folder_path_entry = tk.Entry(window, width=50)
 folder_path_entry.grid(row=0, column=1, sticky="ew", padx=5, pady=7)
@@ -137,6 +143,6 @@ analyze_button = tk.Button(window, text="Ödevleri Analiz Et", command=analyze_a
 analyze_button.grid(row=4, column=0, columnspan=3, pady=(15,20)) 
 
 # Kolonların genişlemesi
-window.columnconfigure(1, weight=1) # İkinci kolon
+window.columnconfigure(1, weight=1)
 
 window.mainloop()
